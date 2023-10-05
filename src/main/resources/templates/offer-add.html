@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
+
+<head>
+    <meta charset="UTF-8">
+    <title>MobiLeLeLe</title>
+    <link rel="stylesheet" href="/css/reset-css.css"/>
+    <link rel="stylesheet" href="/css/bootstrap.min.css"/>
+    <link rel="stylesheet" type="text/css" href="/css/main.css"/>
+    <script src="/js/jquery-3.5.1.slim.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+</head>
+<header>
+    <th:block th:include="/block/header.html::nav"></th:block>
+</header>
+<body>
+
+
+<div class="container">
+    <form th:action="@{/processForm}" method="POST"
+          class="main-form mx-auto col-md-8 d-flex flex-column justify-content-center">
+        <h2 id="upload" class="text-center text-white">Качи обява</h2>
+        <div class="row">
+            <div class="form-group col-md-6 mb-3">
+                <label class="text-center text-white font-weight-bold" for="town-select">Град</label>
+                <select name="townId" id="town-select" class="form-control"
+                        onchange="f()">
+                    <option value="">-- Изберете грaд --</option>
+                    <option th:each="town : ${towns}" th:value="${town.id}" th:text="${town.name}"></option>
+                </select>
+            </div>
+            <div class="form-group col-md-6 mb-3">
+                <label for="neighborhood-select" class="text-white font-weight-bold">Квартал</label>
+                <select name="neighborhoodId" id="neighborhood-select" class="form-control">
+                    <option value="">-- Изберете квартал --</option>
+                </select>
+            </div>
+
+        <div class="form-group col-md-6 mb-3">
+            <label for="square-meters" class="text-white font-weight-bold">Квадратура</label>
+            <input id="square-meters" type="number" min="0" max="2000" step="10"
+                   class="form-control"
+                   placeholder="Квадратни метри"/>
+
+        </div>
+            <div class="form-group col-md-6 mb-3">
+                <label for="floor1" class="text-white font-weight-bold">Етаж: </label>
+                <div>
+                    <div id="floor">
+                <input id="floor1" type="number" min="0" max="300" step="1"
+                       class="form-control"
+                       placeholder="-- Етаж --"/>
+
+                </div>
+
+                   <div id="of">
+                    <input id="of1" type="number" min="0" max="300" step="1"
+                           class="form-control"
+                           placeholder="-- От --"/>
+                </div>
+                    <p class="errors alert alert-danger">
+                        Тези полета са задължителни!
+                    </p>
+                </div>
+                <h1>Upload an Image</h1>
+<!--                <form action="/upload" method="post" enctype="multipart/form-data">-->
+                    <label for="file">Select an image:</label>
+                    <input type="file" name="file" id="file" accept="image/*" required>
+                    <br><br>
+
+<!--                </form>-->
+
+
+</div>
+        </div>
+        <div class="button-holder d-flex">
+            <input type="submit" class="btn btn-info btn-lg" value="Качи обява"/>
+        </div>
+    </form>
+</div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script>
+        function f() {
+            var $j = jQuery.noConflict();
+            console.log("e tuka pone da vlezze");
+            $j(document).ready(function () {
+                $j('#town-select').change(function () {
+
+
+                    let townId = $j(this).val();
+                    console.log(townId);
+                    if (townId) {
+
+                        $j.ajax({
+                            url: '/offers/neighborhoods',
+                            type: 'GET',
+                            data: {townId: townId},
+                            success: function (response) {
+                                let neighborhoodSelect = $('#neighborhood-select');
+                                neighborhoodSelect.empty();
+                                console.log("dali shte stane ")
+                                let i = 1;
+                                neighborhoodSelect.append('<option value="">-- Изберете квартал --</option>').append(
+                                    $.each(response, function (index, neighborhood) {
+                                        console.log(i++);
+                                        neighborhoodSelect.append('<option value="' + neighborhood.id + '">' + neighborhood.name + '</option>');
+                                    }));
+                            },
+                            error: function (xhr, status, error) {
+                                console.error(xhr.responseText);
+                            }
+                        });
+                    } else {
+                        $j('#neighborhood-select').empty();
+                    }
+                });
+            });
+        }
+
+    </script>
+
+
+
+<div>
+    <footer></footer>
+</div>
+
+</body>
+</html>
